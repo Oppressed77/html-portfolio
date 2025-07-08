@@ -93,15 +93,25 @@ def extract_single_archive(archive_path, passwords):
 
 def main():
     parser = argparse.ArgumentParser(description="Extracts .zip, .rar, and .7z archives in a directory, using passwords from a file.")
-    parser.add_argument("directory", help="The directory containing archives and the password file.")
-    parser.add_argument("--pwfile", default=DEFAULT_PASSWORD_FILE, help=f"Name of the password file (default: {DEFAULT_PASSWORD_FILE}).")
+    # Make directory argument optional
+    parser.add_argument("-d", "--directory",
+                        help="The directory containing archives and the password file. Defaults to script's own directory.")
+    parser.add_argument("--pwfile", default=DEFAULT_PASSWORD_FILE,
+                        help=f"Name of the password file (default: {DEFAULT_PASSWORD_FILE}).")
 
     args = parser.parse_args()
-    target_directory = args.directory
     password_file_name = args.pwfile
 
+    if args.directory:
+        target_directory = args.directory
+    else:
+        # Default to the script's own directory
+        script_path = os.path.abspath(__file__)
+        target_directory = os.path.dirname(script_path)
+        logging.info(f"No directory specified, defaulting to script directory: {target_directory}")
+
     if not os.path.isdir(target_directory):
-        logging.error(f"Provided path '{target_directory}' is not a valid directory.")
+        logging.error(f"Determined path '{target_directory}' is not a valid directory.")
         return
 
     archive_files = find_archive_files(target_directory)
