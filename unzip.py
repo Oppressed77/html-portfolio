@@ -35,13 +35,29 @@ def find_password_file(directory, password_file_name=DEFAULT_PASSWORD_FILE):
         return None
 
 def read_passwords(password_file_path):
-    """Reads passwords from the password file, one per line."""
+    """Reads passwords from the password file, stripping 'pass:' prefix."""
     passwords = []
     if password_file_path:
         try:
             with open(password_file_path, 'r') as f:
-                passwords = [line.strip() for line in f if line.strip()]
-            logging.info(f"Read {len(passwords)} password(s).")
+                for line in f:
+                    stripped_line = line.strip()
+                    if stripped_line.lower().startswith("pass:"):
+                        password = stripped_line[5:].strip() # Get text after "pass:" and strip again
+                        if password: # Ensure password is not empty after stripping "pass:"
+                            passwords.append(password)
+                        else:
+                            logging.warning(f"Found 'pass:' prefix but password was empty in line: '{line.strip()}'")
+                    elif stripped_line: # Non-empty line that doesn't start with "pass:"
+                        # Decide if these should be treated as passwords or ignored.
+                        # For now, let's assume lines without "pass:" are also potential passwords if not empty.
+                        # If they should be ignored, this part can be removed.
+                        passwords.append(stripped_line)
+                        logging.info(f"Read password without 'pass:' prefix: '{stripped_line}'")
+
+            logging.info(f"Read {len(passwords)} potential password(s) after processing prefixes.")
+            if passwords:
+                logging.debug(f"Passwords loaded: {passwords}") # Log actual passwords only at debug level
         except Exception as e:
             logging.error(f"Error reading password file {password_file_path}: {e}")
     return passwords
