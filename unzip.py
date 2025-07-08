@@ -39,7 +39,8 @@ def read_passwords(password_file_path):
     passwords = []
     if password_file_path:
         try:
-            with open(password_file_path, 'r') as f:
+            # Specify UTF-8 encoding and ignore errors
+            with open(password_file_path, 'r', encoding='utf-8', errors='ignore') as f:
                 for line in f:
                     stripped_line = line.strip()
                     if stripped_line.lower().startswith("pass:"):
