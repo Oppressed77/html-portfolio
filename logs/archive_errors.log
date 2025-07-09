@@ -1,0 +1,1 @@
+File: archive1.zip, Error: "Outer error during extraction process for test_files/archive1.zip: module 'patoolib' has no attribute 'util'", Count: 1\nFile: archive_ok.zip, Error: "Outer error during extraction process for test_files/archive_ok.zip: module 'patoolib' has no attribute 'util'", Count: 1\n
